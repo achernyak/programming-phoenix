@@ -11,7 +11,7 @@ defmodule Rumbl.Video do
     timestamps
   end
 
-  @required_fields ~w(url title description)
+  @required_fields ~w(videos url title description)
   @optional_fields ~w()
 
   @doc """
