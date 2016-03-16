@@ -1,8 +1,7 @@
 defmodule Rumbl.Video do
   use Rumbl.Web, :model
 
-  schema "v" do
-    field :videos, :string
+  schema "videos" do
     field :url, :string
     field :title, :string
     field :description, :string
@@ -11,7 +10,7 @@ defmodule Rumbl.Video do
     timestamps
   end
 
-  @required_fields ~w(videos url title description)
+  @required_fields ~w(url title description)
   @optional_fields ~w()
 
   @doc """

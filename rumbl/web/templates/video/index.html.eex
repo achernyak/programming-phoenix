@@ -1,9 +1,8 @@
-<h2>Listing v</h2>
+<h2>Listing videos</h2>
 
 <table class="table">
   <thead>
     <tr>
-      <th>Videos</th>
       <th>User</th>
       <th>Url</th>
       <th>Title</th>
@@ -13,9 +12,8 @@
     </tr>
   </thead>
   <tbody>
-<%= for video <- @v do %>
+<%= for video <- @videos do %>
     <tr>
-      <td><%= video.videos %></td>
       <td><%= video.user_id %></td>
       <td><%= video.url %></td>
       <td><%= video.title %></td>

@@ -3,11 +3,6 @@
 <ul>
 
   <li>
-    <strong>Videos:</strong>
-    <%= @video.videos %>
-  </li>
-
-  <li>
     <strong>User:</strong>
     <%= @video.user_id %>
   </li>

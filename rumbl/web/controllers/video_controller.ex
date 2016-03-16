@@ -6,8 +6,8 @@ defmodule Rumbl.VideoController do
   plug :scrub_params, "video" when action in [:create, :update]
 
   def index(conn, _params) do
-    v = Repo.all(Video)
-    render(conn, "index.html", v: v)
+    videos = Repo.all(Video)
+    render(conn, "index.html", videos: videos)
   end
 
   def new(conn, _params) do
