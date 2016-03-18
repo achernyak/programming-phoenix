@@ -5,7 +5,6 @@ defmodule Rumbl.VideoController do
 
   plug :scrub_params, "video" when action in [:create, :update]
 
-
   alias Rumbl.Category
 
   plug :load_categories when action in [:new, :create, :edit, :update]
@@ -41,7 +40,7 @@ defmodule Rumbl.VideoController do
   def create(conn, %{"video" => video_params}, user) do
     changeset =
       user
-      |> build_assoc(:video)
+      |> build_assoc(:videos)
       |> Video.changeset(video_params)
 
     case Repo.insert(changeset) do
