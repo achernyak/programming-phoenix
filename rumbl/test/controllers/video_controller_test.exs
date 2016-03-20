@@ -35,6 +35,14 @@ defmodule Rumbl.VideoControllerTest do
     assert Repo.get_by!(Video, @valid_attrs).user_id == user.id
   end
 
+  @tag login_as: "max"
+  test "does not create video and renders errors with invalid", %{conn: conn} do
+    count_before = video_count(Video)
+    conn = post conn, video_path(conn, :create), video: @invalid_attrs
+    assert html_response(conn, 200) =~ "check the errors"
+    assert video_count(Video) == count_before
+  end\
+
   test "requires user authentication on all actions", %{conn: conn} do
     Enum.each([
       get(conn, video_path(conn, :new)),
