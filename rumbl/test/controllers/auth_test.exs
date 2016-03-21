@@ -2,6 +2,15 @@ defmodule Rumbl.AuthTest do
   use Rumbl.ConnCase
   alias Rumbl.Auth
 
+  setup %{conn: conn} do
+    conn =
+      conn
+      |> bypass_through(Rumbl.Router, :browser)
+      |> get("/")
+
+    {:ok, %{conn: conn}}
+  end
+
   test "authenticate_user halts when no current_user exists",
   %{conn: conn} do
     conn = Auth.authenticate_user(conn, [])
@@ -12,7 +21,7 @@ defmodule Rumbl.AuthTest do
   %{conn: conn} do
     conn =
       conn
-      |> assign(:cuurent_user, %Rumbl.User{})
+      |> assign(:current_user, %Rumbl.User{})
       |> Auth.authenticate_user([])
 
     refute conn.halted
