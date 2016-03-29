@@ -30,7 +30,7 @@ defmodule Rumbl.Video do
 
   defp slugify_title(changeset) do
     if title = get_change(changeset, :title) do
-      put_change(changeset, :slug, sligify(title))
+      put_change(changeset, :slug, slugify(title))
     else
       changeset
     end
@@ -40,5 +40,11 @@ defmodule Rumbl.Video do
     str
     |> String.downcase()
     |> String.replace(~r/[^\w-]+/, "-")
+  end
+end
+
+defimpl Phoenix.Param, for: Rumbl.Video do
+  def to_param(%{slug: slug, id: id}) do
+    "#{id}-#{slug}"
   end
 end
