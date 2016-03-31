@@ -31,7 +31,7 @@ let Video = {
         })
 
         vidChannel.on("new_annotation", (resp) => {
-            this.renderAnnotation(msgContainer.resp)
+            this.renderAnnotation(msgContainer, resp)
         })
 
         vidChannel.join()
