@@ -15,12 +15,36 @@ defmodule Rumbl.InfoSys do
 
     backends
     |> Enum.map(&spawn_query(&1, query, limit))
+    |> await_results(opts)
+    |> Enum.sort(&(&1.score >= &2.score))
+    |> Enum.take(limit)
   end
 
   defp spawn_query(backend, query, limit) do
     query_ref = make_ref()
     opts = [backend, query, query_ref, self(), limit]
     {:ok, pid} = Supervisor.start_child(Rumbl.InfoSys.Supervisor, opts)
-    {pid, query_ref}
+    monitor_ref = Process.monitor(pid)
+    {pid, monitor_ref, query_ref}
+  end
+
+  defp await_results(children, _opts) do
+    await_results(children, [], :infinity)
+  end
+
+  defp await_results([head|tail], acc, timeout) do
+    {pid, monitor_ref, query_ref} = head
+
+    receive do
+      {:results, ^query_ref, results} ->
+        Process.demonitor(monitor_ref, [:flush])
+        await_results(tail, results ++ acc, timeout)
+      {:DOWN, ^monitor_ref, :process, ^pid, _reason} ->
+        await_results(tail, acc, timeout)
+    end
+  end
+
+  defp await_results([], acc, _timeout) do
+    acc
   end
 end
