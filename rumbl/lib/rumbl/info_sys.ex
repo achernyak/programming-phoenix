@@ -2,7 +2,7 @@ defmodule Rumbl.InfoSys do
   @backends [Rumbl.InfoSys.Wolfram]
 
   defmodule Result do
-    defstruct score: 0, text: nil, ulr: nil, backend: nil
+    defstruct score: 0, text: nil, url: nil, backend: nil
   end
 
   def start_link(backend, query, query_ref, owner, limit) do
@@ -28,8 +28,12 @@ defmodule Rumbl.InfoSys do
     {pid, monitor_ref, query_ref}
   end
 
-  defp await_results(children, _opts) do
-    await_results(children, [], :infinity)
+  defp await_results(children, opts) do
+    timeout = opts[:timout] || 5000
+    timer = Process.send_after(self(), :timedout, timeout)
+    results = await_results(children, [], :infinity)
+    cleanup(timer)
+    results
   end
 
   defp await_results([head|tail], acc, timeout) do
@@ -41,10 +45,31 @@ defmodule Rumbl.InfoSys do
         await_results(tail, results ++ acc, timeout)
       {:DOWN, ^monitor_ref, :process, ^pid, _reason} ->
         await_results(tail, acc, timeout)
+      :timedout ->
+        kill(pid, monitor_ref)
+        await_results(tail, acc, 0)
+    after
+      timeout ->
+        kill(pid, monitor_ref)
+        await_results(tail, acc, 0)
     end
   end
 
   defp await_results([], acc, _timeout) do
     acc
+  end
+
+  defp kill(pid, ref) do
+    Process.demonitor(ref, [:flush])
+    Process.exit(pid, :kill)
+  end
+
+  defp cleanup(timer) do
+    :erlang.cancel_timer(timer)
+    receive do
+      :timedout -> :ok
+    after
+      0 -> :ok
+    end
   end
 end
